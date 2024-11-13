@@ -1,20 +1,20 @@
-import { Container, IHitArea, EventSystem, DestroyOptions, View, PointData, Point, Rectangle, Ticker } from 'pixi.js';
-
+import { Container, DestroyOptions, EventSystem, IHitArea, Point, PointData, Rectangle, Ticker, View } from 'pixi.js';
 import { InputManager } from './InputManager';
 import { PluginManager } from './PluginManager';
 import {
-    Animate, IAnimateOptions,
-    Bounce, IBounceOptions,
-    Clamp, IClampOptions,
-    ClampZoom, IClampZoomOptions,
-    Decelerate, IDecelerateOptions,
-    Drag, IDragOptions,
-    Follow, IFollowOptions,
-    MouseEdges, IMouseEdgesOptions,
-    Pinch, IPinchOptions,
-    Snap, ISnapOptions,
-    SnapZoom, ISnapZoomOptions,
-    Wheel, IWheelOptions,
+    Animate, Bounce, Clamp, ClampZoom, Decelerate, Drag, Follow, IAnimateOptions,
+    IBounceOptions,
+    IClampOptions,
+    IClampZoomOptions,
+    IDecelerateOptions,
+    IDragOptions,
+    IFollowOptions,
+    IMouseEdgesOptions,
+    IPinchOptions,
+    ISnapOptions,
+    ISnapZoomOptions,
+    IWheelOptions,
+    MouseEdges, Pinch, Snap, SnapZoom, Wheel,
 } from './plugins';
 
 /** Options for {@link Viewport}. */

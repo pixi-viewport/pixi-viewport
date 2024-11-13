@@ -115,62 +115,62 @@ export class ClampZoom extends Plugin
             }
         }
         else
-        if (this.options.minScale || this.options.maxScale)
-        {
-            const minScale: IScale = { x: null, y: null };
-            const maxScale: IScale = { x: null, y: null };
+            if (this.options.minScale || this.options.maxScale)
+            {
+                const minScale: IScale = { x: null, y: null };
+                const maxScale: IScale = { x: null, y: null };
 
-            if (typeof this.options.minScale === 'number')
-            {
-                minScale.x = this.options.minScale;
-                minScale.y = this.options.minScale;
-            }
-            else if (this.options.minScale !== null)
-            {
-                const optsMinScale = this.options.minScale as IScale;
+                if (typeof this.options.minScale === 'number')
+                {
+                    minScale.x = this.options.minScale;
+                    minScale.y = this.options.minScale;
+                }
+                else if (this.options.minScale !== null)
+                {
+                    const optsMinScale = this.options.minScale as IScale;
 
-                minScale.x = typeof optsMinScale.x === 'undefined' ? null : optsMinScale.x;
-                minScale.y = typeof optsMinScale.y === 'undefined' ? null : optsMinScale.y;
-            }
+                    minScale.x = typeof optsMinScale.x === 'undefined' ? null : optsMinScale.x;
+                    minScale.y = typeof optsMinScale.y === 'undefined' ? null : optsMinScale.y;
+                }
 
-            if (typeof this.options.maxScale === 'number')
-            {
-                maxScale.x = this.options.maxScale;
-                maxScale.y = this.options.maxScale;
-            }
-            else if (this.options.maxScale !== null)
-            {
-                const optsMaxScale = this.options.maxScale as IScale;
+                if (typeof this.options.maxScale === 'number')
+                {
+                    maxScale.x = this.options.maxScale;
+                    maxScale.y = this.options.maxScale;
+                }
+                else if (this.options.maxScale !== null)
+                {
+                    const optsMaxScale = this.options.maxScale as IScale;
 
-                maxScale.x = typeof optsMaxScale.x === 'undefined' ? null : optsMaxScale.x;
-                maxScale.y = typeof optsMaxScale.y === 'undefined' ? null : optsMaxScale.y;
-            }
+                    maxScale.x = typeof optsMaxScale.x === 'undefined' ? null : optsMaxScale.x;
+                    maxScale.y = typeof optsMaxScale.y === 'undefined' ? null : optsMaxScale.y;
+                }
 
-            let scaleX = this.parent.scale.x;
-            let scaleY = this.parent.scale.y;
+                let scaleX = this.parent.scale.x;
+                let scaleY = this.parent.scale.y;
 
-            if (minScale.x !== null && scaleX < minScale.x)
-            {
-                scaleX = minScale.x;
+                if (minScale.x !== null && scaleX < minScale.x)
+                {
+                    scaleX = minScale.x;
+                }
+                if (maxScale.x !== null && scaleX > maxScale.x)
+                {
+                    scaleX = maxScale.x;
+                }
+                if (minScale.y !== null && scaleY < minScale.y)
+                {
+                    scaleY = minScale.y;
+                }
+                if (maxScale.y !== null && scaleY > maxScale.y)
+                {
+                    scaleY = maxScale.y;
+                }
+                if (scaleX !== this.parent.scale.x || scaleY !== this.parent.scale.y)
+                {
+                    this.parent.scale.set(scaleX, scaleY);
+                    this.parent.emit('zoomed', { viewport: this.parent, type: 'clamp-zoom' });
+                }
             }
-            if (maxScale.x !== null && scaleX > maxScale.x)
-            {
-                scaleX = maxScale.x;
-            }
-            if (minScale.y !== null && scaleY < minScale.y)
-            {
-                scaleY = minScale.y;
-            }
-            if (maxScale.y !== null && scaleY > maxScale.y)
-            {
-                scaleY = maxScale.y;
-            }
-            if (scaleX !== this.parent.scale.x || scaleY !== this.parent.scale.y)
-            {
-                this.parent.scale.set(scaleX, scaleY);
-                this.parent.emit('zoomed', { viewport: this.parent, type: 'clamp-zoom' });
-            }
-        }
     }
 
     public reset(): void

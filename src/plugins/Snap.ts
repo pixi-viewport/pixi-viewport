@@ -1,5 +1,5 @@
-import { Plugin } from './Plugin';
 import ease from '../ease';
+import { Plugin } from './Plugin';
 
 import type { Viewport } from '../Viewport';
 

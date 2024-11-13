@@ -1,11 +1,11 @@
 import { Point, Rectangle } from 'pixi.js';
-import { Plugin } from './Plugin';
 import ease from '../ease';
+import { Plugin } from './Plugin';
 
-import type { Drag } from './Drag';
-import type { IDecelerateOptions } from './Decelerate';
-import type { Pinch } from './Pinch';
 import type { Viewport } from '../Viewport';
+import type { IDecelerateOptions } from './Decelerate';
+import type { Drag } from './Drag';
+import type { Pinch } from './Pinch';
 
 /** Options for {@link Bounce}. */
 export interface IBounceOptions

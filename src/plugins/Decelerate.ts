@@ -1,7 +1,7 @@
+import { MovedEvent } from '../types';
 import { Plugin } from './Plugin';
 
 import type { Viewport } from '../Viewport';
-import { MovedEvent } from '../types';
 
 export interface IDecelerateOptions
 {

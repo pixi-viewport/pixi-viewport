@@ -1,107 +1,106 @@
 import { Point } from 'pixi.js';
 import { Plugin } from './Plugin';
 
-import type { Decelerate } from './Decelerate';
-import type { FederatedPointerEvent } from 'pixi.js';
-import type { PointData } from 'pixi.js';
+import type { FederatedPointerEvent, PointData } from 'pixi.js';
 import type { Viewport } from '../Viewport';
+import type { Decelerate } from './Decelerate';
 
 /** Options for {@link Drag}. */
 export interface IDragOptions
 {
     /**
-     * direction to drag
-     *
-     * @default "all"
-     */
+   * direction to drag
+   *
+   * @default "all"
+   */
     direction?: string;
 
     /**
-     * whether click to drag is active
-     *
-     * @default true
-     */
+   * whether click to drag is active
+   *
+   * @default true
+   */
     pressDrag?: boolean;
 
     /**
-     * Use wheel to scroll in direction (unless wheel plugin is active)
-     *
-     * @default true
-     */
+   * Use wheel to scroll in direction (unless wheel plugin is active)
+   *
+   * @default true
+   */
     wheel?: boolean;
 
     /**
-     * number of pixels to scroll with each wheel spin
-     *
-     * @default 1
-     */
+   * number of pixels to scroll with each wheel spin
+   *
+   * @default 1
+   */
     wheelScroll?: number;
 
     /**
-     * reverse the direction of the wheel scroll
-     *
-     * @default false
-     */
+   * reverse the direction of the wheel scroll
+   *
+   * @default false
+   */
     reverse?: boolean;
 
     /**
-     * clamp wheel(to avoid weird bounce with mouse wheel). Can be 'x' or 'y' or `true`.
-     *
-     * @default false
-     */
+   * clamp wheel(to avoid weird bounce with mouse wheel). Can be 'x' or 'y' or `true`.
+   *
+   * @default false
+   */
     clampWheel?: boolean | string;
 
     /**
-     * where to place world if too small for screen
-     *
-     * @default "center"
-     */
+   * where to place world if too small for screen
+   *
+   * @default "center"
+   */
     underflow?: string;
 
     /**
-     * factor to multiply drag to increase the speed of movement
-     *
-     * @default 1
-     */
+   * factor to multiply drag to increase the speed of movement
+   *
+   * @default 1
+   */
     factor?: number;
 
     /**
-     * Changes which mouse buttons trigger drag.
-     *
-     * Use: 'all', 'left', right' 'middle', or some combination, like, 'middle-right'; you may want to set
-     * `viewport.options.disableOnContextMenu` if you want to use right-click dragging.
-     *
-     * @default "all"
-     */
+   * Changes which mouse buttons trigger drag.
+   *
+   * Use: 'all', 'left', right' 'middle', or some combination, like, 'middle-right'; you may want to set
+   * `viewport.options.disableOnContextMenu` if you want to use right-click dragging.
+   *
+   * @default "all"
+   */
     mouseButtons?: 'all' | string;
 
     /**
-     * Array containing {@link key|https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} codes of
-     * keys that can be pressed for the drag to be triggered, e.g.: ['ShiftLeft', 'ShiftRight'}.
-     *
-     * @default null
-     */
+   * Array containing {@link key|https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} codes of
+   * keys that can be pressed for the drag to be triggered, e.g.: ['ShiftLeft', 'ShiftRight'}.
+   *
+   * @default null
+   */
     keyToPress?: string[] | null;
 
     /**
-     * Ignore keyToPress for touch events.
-     *
-     * @default false
-     */
+   * Ignore keyToPress for touch events.
+   *
+   * @default false
+   */
     ignoreKeyToPressOnTouch?: boolean;
 
     /**
-     * Scaling factor for non-DOM_DELTA_PIXEL scrolling events.
-     *
-     * @default 20
-     */
+   * Scaling factor for non-DOM_DELTA_PIXEL scrolling events.
+   *
+   * @default 20
+   */
     lineHeight?: number;
 
     /**
-     * Swap x and y axes when scrolling.
-     *
-     * @default false
-     */
+   * Swap x and y axes when scrolling.
+   *
+   * @default false
+   */
     wheelSwapAxes?: boolean;
 }
 
@@ -162,11 +161,14 @@ export class Drag extends Plugin
     protected current?: number;
 
     /** Array of event-handlers for window */
-    private windowEventHandlers: Array<{event: string, handler: (e: any) => void}> = [];
+    private windowEventHandlers: Array<{
+        event: string;
+        handler: (e: any) => void;
+    }> = [];
 
     /**
-     * This is called by {@link Viewport.drag}.
-     */
+   * This is called by {@link Viewport.drag}.
+   */
     constructor(parent: Viewport, options = {})
     {
         super(parent);
@@ -174,8 +176,14 @@ export class Drag extends Plugin
         this.options = Object.assign({}, DEFAULT_DRAG_OPTIONS, options);
         this.moved = false;
         this.reverse = this.options.reverse ? 1 : -1;
-        this.xDirection = !this.options.direction || this.options.direction === 'all' || this.options.direction === 'x';
-        this.yDirection = !this.options.direction || this.options.direction === 'all' || this.options.direction === 'y';
+        this.xDirection
+      = !this.options.direction
+      || this.options.direction === 'all'
+      || this.options.direction === 'x';
+        this.yDirection
+      = !this.options.direction
+      || this.options.direction === 'all'
+      || this.options.direction === 'y';
         this.keyIsPressed = false;
 
         this.parseUnderflow();
@@ -188,29 +196,36 @@ export class Drag extends Plugin
     }
 
     /**
-     * Handles keypress events and set the keyIsPressed boolean accordingly
-     *
-     * @param {array} codes - key codes that can be used to trigger drag event
-     */
+   * Handles keypress events and set the keyIsPressed boolean accordingly
+   *
+   * @param {array} codes - key codes that can be used to trigger drag event
+   */
     protected handleKeyPresses(codes: string[]): void
     {
         const keydownHandler = (e: KeyboardEvent) =>
         {
             if (codes.includes(e.code))
-            { this.keyIsPressed = true; }
+            {
+                this.keyIsPressed = true;
+            }
         };
 
         const keyupHandler = (e: KeyboardEvent) =>
         {
             if (codes.includes(e.code))
-            { this.keyIsPressed = false; }
+            {
+                this.keyIsPressed = false;
+            }
         };
 
         this.addWindowEventHandler('keyup', keyupHandler);
         this.addWindowEventHandler('keydown', keydownHandler);
     }
 
-    private addWindowEventHandler(event: string, handler: (e: any) => void): void
+    private addWindowEventHandler(
+        event: string,
+        handler: (e: any) => void,
+    ): void
     {
         if (typeof window === 'undefined') return;
         window.addEventListener(event, handler);
@@ -227,9 +242,9 @@ export class Drag extends Plugin
     }
 
     /**
-     * initialize mousebuttons array
-     * @param {string} buttons
-     */
+   * initialize mousebuttons array
+   * @param {string} buttons
+   */
     protected mouseButtons(buttons: string): void
     {
         if (!buttons || buttons === 'all')
@@ -241,7 +256,7 @@ export class Drag extends Plugin
             this.mouse = [
                 buttons.indexOf('left') !== -1,
                 buttons.indexOf('middle') !== -1,
-                buttons.indexOf('right') !== -1
+                buttons.indexOf('right') !== -1,
             ];
         }
     }
@@ -285,15 +300,15 @@ export class Drag extends Plugin
     }
 
     /**
-     * @param {PIXI.FederatedPointerEvent} event
-     * @returns {boolean}
-     */
+   * @param {PIXI.FederatedPointerEvent} event
+   * @returns {boolean}
+   */
     protected checkButtons(event: FederatedPointerEvent): boolean
     {
         const isMouse = event.pointerType === 'mouse';
         const count = this.parent.input.count();
 
-        if ((count === 1) || (count > 1 && !this.parent.plugins.get('pinch', true)))
+        if (count === 1 || (count > 1 && !this.parent.plugins.get('pinch', true)))
         {
             if (!isMouse || this.mouse[event.button])
             {
@@ -305,14 +320,17 @@ export class Drag extends Plugin
     }
 
     /**
-     * @param {PIXI.FederatedPointerEvent} event
-     * @returns {boolean}
-     */
+   * @param {PIXI.FederatedPointerEvent} event
+   * @returns {boolean}
+   */
     protected checkKeyPress(event: FederatedPointerEvent): boolean
     {
-        return (!this.options.keyToPress
-            || this.keyIsPressed
-            || (this.options.ignoreKeyToPressOnTouch && event.data.pointerType === 'touch'));
+        return (
+            !this.options.keyToPress
+      || this.keyIsPressed
+      || (this.options.ignoreKeyToPressOnTouch
+        && event.data.pointerType === 'touch')
+        );
     }
 
     public down(event: FederatedPointerEvent): boolean
@@ -324,6 +342,11 @@ export class Drag extends Plugin
         if (this.checkButtons(event) && this.checkKeyPress(event))
         {
             this.last = { x: event.global.x, y: event.global.y };
+            (this.parent.parent || this.parent).toLocal(
+                this.last,
+                undefined,
+                this.last,
+            );
             this.current = event.pointerId;
 
             return true;
@@ -350,17 +373,28 @@ export class Drag extends Plugin
             const y = event.global.y;
             const count = this.parent.input.count();
 
-            if (count === 1 || (count > 1 && !this.parent.plugins.get('pinch', true)))
+            if (
+                count === 1
+        || (count > 1 && !this.parent.plugins.get('pinch', true))
+            )
             {
-                const distX = x - this.last.x;
-                const distY = y - this.last.y;
+                const newPoint = { x, y };
 
-                if (this.moved
-                    || ((this.xDirection && this.parent.input.checkThreshold(distX))
-                    || (this.yDirection && this.parent.input.checkThreshold(distY))))
+                (this.parent.parent || this.parent).toLocal(
+                    newPoint,
+                    undefined,
+                    newPoint,
+                );
+
+                const distX = newPoint.x - this.last.x;
+                const distY = newPoint.y - this.last.y;
+
+                if (
+                    this.moved
+          || (this.xDirection && this.parent.input.checkThreshold(distX))
+          || (this.yDirection && this.parent.input.checkThreshold(distY))
+                )
                 {
-                    const newPoint = { x, y };
-
                     if (this.xDirection)
                     {
                         this.parent.x += (newPoint.x - this.last.x) * this.options.factor;
@@ -376,7 +410,7 @@ export class Drag extends Plugin
                             event,
                             screen: new Point(this.last.x, this.last.y),
                             world: this.parent.toWorld(new Point(this.last.x, this.last.y)),
-                            viewport: this.parent
+                            viewport: this.parent,
                         });
                     }
                     this.moved = true;
@@ -422,8 +456,11 @@ export class Drag extends Plugin
             {
                 const screen = new Point(this.last.x, this.last.y);
 
+                (this.parent.parent || this.parent).toGlobal(screen, screen, true);
+
                 this.parent.emit('drag-end', {
-                    event, screen,
+                    event,
+                    screen,
                     world: this.parent.toWorld(screen),
                     viewport: this.parent,
                 });
@@ -453,15 +490,19 @@ export class Drag extends Plugin
                 const step = event.deltaMode ? this.options.lineHeight : 1;
 
                 const deltas = [event.deltaX, event.deltaY];
-                const [deltaX, deltaY] = this.options.wheelSwapAxes ? deltas.reverse() : deltas;
+                const [deltaX, deltaY] = this.options.wheelSwapAxes
+                    ? deltas.reverse()
+                    : deltas;
 
                 if (this.xDirection)
                 {
-                    this.parent.x += deltaX * step * this.options.wheelScroll * this.reverse;
+                    this.parent.x
+            += deltaX * step * this.options.wheelScroll * this.reverse;
                 }
                 if (this.yDirection)
                 {
-                    this.parent.y += deltaY * step * this.options.wheelScroll * this.reverse;
+                    this.parent.y
+            += deltaY * step * this.options.wheelScroll * this.reverse;
                 }
                 if (this.options.clampWheel)
                 {
@@ -493,7 +534,8 @@ export class Drag extends Plugin
 
     public clamp(): void
     {
-        const decelerate: Partial<Decelerate> = this.parent.plugins.get('decelerate', true) || {};
+        const decelerate: Partial<Decelerate>
+      = this.parent.plugins.get('decelerate', true) || {};
 
         if (this.options.clampWheel !== 'y')
         {
@@ -505,21 +547,24 @@ export class Drag extends Plugin
                         this.parent.x = 0;
                         break;
                     case 1:
-                        this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth);
+                        this.parent.x
+              = this.parent.screenWidth - this.parent.screenWorldWidth;
                         break;
                     default:
-                        this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
+                        this.parent.x
+              = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
                 }
             }
-            else
-            if (this.parent.left < 0)
+            else if (this.parent.left < 0)
             {
                 this.parent.x = 0;
                 decelerate.x = 0;
             }
             else if (this.parent.right > this.parent.worldWidth)
             {
-                this.parent.x = (-this.parent.worldWidth * this.parent.scale.x) + this.parent.screenWidth;
+                this.parent.x
+          = -this.parent.worldWidth * this.parent.scale.x
+          + this.parent.screenWidth;
                 decelerate.x = 0;
             }
         }
@@ -533,10 +578,12 @@ export class Drag extends Plugin
                         this.parent.y = 0;
                         break;
                     case 1:
-                        this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
+                        this.parent.y
+              = this.parent.screenHeight - this.parent.screenWorldHeight;
                         break;
                     default:
-                        this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
+                        this.parent.y
+              = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
                 }
             }
             else
@@ -548,7 +595,9 @@ export class Drag extends Plugin
                 }
                 if (this.parent.bottom > this.parent.worldHeight)
                 {
-                    this.parent.y = (-this.parent.worldHeight * this.parent.scale.y) + this.parent.screenHeight;
+                    this.parent.y
+            = -this.parent.worldHeight * this.parent.scale.y
+            + this.parent.screenHeight;
                     decelerate.y = 0;
                 }
             }

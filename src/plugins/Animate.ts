@@ -1,6 +1,6 @@
-import { PointData, Point } from 'pixi.js';
-import { Plugin } from './Plugin';
+import { Point, PointData } from 'pixi.js';
 import ease from '../ease';
+import { Plugin } from './Plugin';
 
 import type { Viewport } from '../Viewport';
 

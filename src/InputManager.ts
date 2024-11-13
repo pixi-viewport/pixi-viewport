@@ -1,4 +1,4 @@
-import { Point, Rectangle, PointData, FederatedPointerEvent } from 'pixi.js';
+import { FederatedPointerEvent, Point, PointData, Rectangle } from 'pixi.js';
 
 import type { Viewport } from './Viewport';
 

@@ -1,3 +1,4 @@
+import type { FederatedEvent } from 'pixi.js';
 import type {
     Animate,
     Bounce,
@@ -13,7 +14,6 @@ import type {
     SnapZoom,
     Wheel,
 } from './plugins';
-import type { FederatedEvent } from 'pixi.js';
 import type { Viewport } from './Viewport';
 
 const PLUGIN_ORDER = [

@@ -1,5 +1,5 @@
+import { Point, PointData } from 'pixi.js';
 import { Plugin } from './Plugin';
-import { PointData, Point } from 'pixi.js';
 
 import type { Viewport } from '../Viewport';
 
@@ -7,70 +7,70 @@ import type { Viewport } from '../Viewport';
 export interface IWheelOptions
 {
     /**
-     * Percent to scroll with each spin
-     *
-     * @default 0.1
-     */
+   * Percent to scroll with each spin
+   *
+   * @default 0.1
+   */
     percent?: number;
 
     /**
-     * smooth the zooming by providing the number of frames to zoom between wheel spins
-     *
-     * @default false
-     */
+   * smooth the zooming by providing the number of frames to zoom between wheel spins
+   *
+   * @default false
+   */
     smooth?: false | number;
 
     /**
-     * Stop smoothing with any user input on the viewport
-     *
-     * @default true
-     */
+   * Stop smoothing with any user input on the viewport
+   *
+   * @default true
+   */
     interrupt?: boolean;
 
     /**
-     * Reverse the direction of the scroll
-     *
-     * @default false
-     */
+   * Reverse the direction of the scroll
+   *
+   * @default false
+   */
     reverse?: boolean;
 
     /**
-     * Place this point at center during zoom instead of current mouse position
-     *
-     * @default null
-     */
+   * Place this point at center during zoom instead of current mouse position
+   *
+   * @default null
+   */
     center?: Point | null;
 
     /**
-     * Scaling factor for non-DOM_DELTA_PIXEL scrolling events
-     *
-     * @default 20
-     */
+   * Scaling factor for non-DOM_DELTA_PIXEL scrolling events
+   *
+   * @default 20
+   */
     lineHeight?: number;
 
     /**
-     * Axis to zoom
-     *
-     * @default 'all'
-     */
+   * Axis to zoom
+   *
+   * @default 'all'
+   */
     axis?: 'all' | 'x' | 'y';
 
     /**
-     * Array containing {@link key|https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} codes of
-     * keys that can be pressed for the zoom to be triggered, e.g.: ['ShiftLeft', 'ShiftRight'}.
-     *
-     * @default null
-     */
+   * Array containing {@link key|https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} codes of
+   * keys that can be pressed for the zoom to be triggered, e.g.: ['ShiftLeft', 'ShiftRight'}.
+   *
+   * @default null
+   */
     keyToPress?: string[] | null;
 
     /**
-     * pinch the trackpad to zoom
-     */
+   * pinch the trackpad to zoom
+   */
     trackpadPinch?: boolean;
 
     /**
-     * zooms on wheel spin (use this as an alternative to drag.options.wheel)
-     */
+   * zooms on wheel spin (use this as an alternative to drag.options.wheel)
+   */
     wheelZoom?: boolean;
 }
 
@@ -104,8 +104,8 @@ export class Wheel extends Plugin
     protected keyIsPressed: boolean;
 
     /**
-     * This is called by {@link Viewport.wheel}.
-     */
+   * This is called by {@link Viewport.wheel}.
+   */
     constructor(parent: Viewport, options: IWheelOptions = {})
     {
         super(parent);
@@ -119,10 +119,10 @@ export class Wheel extends Plugin
     }
 
     /**
-     * Handles keypress events and set the keyIsPressed boolean accordingly
-     *
-     * @param {array} codes - key codes that can be used to trigger zoom event
-     */
+   * Handles keypress events and set the keyIsPressed boolean accordingly
+   *
+   * @param {array} codes - key codes that can be used to trigger zoom event
+   */
     protected handleKeyPresses(codes: string[]): void
     {
         if (typeof window === 'undefined') return;
@@ -202,16 +202,24 @@ export class Wheel extends Plugin
             }
             else
             {
-                const newPoint = this.parent.toGlobal(oldPoint as PointData);
+                this.parent.parent.toLocal(
+                    oldPoint as PointData,
+                    this.parent,
+                    oldPoint
+                );
+                const comparePoint = this.parent.parent.toLocal(point as PointData);
 
-                this.parent.x += (point as PointData).x - newPoint.x;
-                this.parent.y += (point as PointData).y - newPoint.y;
+                this.parent.x += comparePoint.x - (oldPoint as PointData).x;
+                this.parent.y += comparePoint.y - (oldPoint as PointData).y;
             }
 
             this.parent.emit('moved', { viewport: this.parent, type: 'wheel' });
             (this.smoothingCount as number)++;
 
-            if ((this.smoothingCount as number) >= this.options.smooth)
+            if (
+                typeof this.options.smooth === 'number'
+        && (this.smoothingCount as number) >= this.options.smooth
+            )
             {
                 this.smoothing = null;
             }
@@ -226,7 +234,8 @@ export class Wheel extends Plugin
         }
 
         const point = this.parent.input.getPointerPosition(e);
-        const step = -e.deltaY * (e.deltaMode ? this.options.lineHeight : 1) / 200;
+        const step
+      = (-e.deltaY * (e.deltaMode ? this.options.lineHeight : 1)) / 200;
         const change = Math.pow(2, (1 + this.options.percent) * step);
 
         let oldPoint: PointData | undefined;
@@ -256,14 +265,15 @@ export class Wheel extends Plugin
         }
         else
         {
-            const newPoint = this.parent.toGlobal(oldPoint as PointData);
+            this.parent.parent.toLocal(oldPoint as PointData, this.parent, oldPoint);
+            const comparePoint = this.parent.parent.toLocal(point as PointData);
 
-            this.parent.x += point.x - newPoint.x;
-            this.parent.y += point.y - newPoint.y;
+            this.parent.x += comparePoint.x - (oldPoint as PointData).x;
+            this.parent.y += comparePoint.y - (oldPoint as PointData).y;
         }
+
         this.parent.emit('moved', { viewport: this.parent, type: 'wheel' });
-        this.parent.emit('wheel-start',
-            { event: e, viewport: this.parent });
+        this.parent.emit('wheel-start', { event: e, viewport: this.parent });
     }
 
     public wheel(e: WheelEvent): boolean
@@ -286,19 +296,32 @@ export class Wheel extends Plugin
         {
             const point = this.parent.input.getPointerPosition(e);
             const sign = this.options.reverse ? -1 : 1;
-            const step = sign * -e.deltaY * (e.deltaMode ? this.options.lineHeight : 1) / 500;
+            const step
+        = (sign * -e.deltaY * (e.deltaMode ? this.options.lineHeight : 1)) / 500;
             const change = Math.pow(2, (1 + this.options.percent) * step);
 
             if (this.options.smooth)
             {
                 const original = {
-                    x: this.smoothing ? this.smoothing.x * (this.options.smooth - (this.smoothingCount as number)) : 0,
-                    y: this.smoothing ? this.smoothing.y * (this.options.smooth - (this.smoothingCount as number)) : 0
+                    x: this.smoothing
+                        ? this.smoothing.x
+              * (this.options.smooth - (this.smoothingCount as number))
+                        : 0,
+                    y: this.smoothing
+                        ? this.smoothing.y
+              * (this.options.smooth - (this.smoothingCount as number))
+                        : 0,
                 };
 
                 this.smoothing = {
-                    x: (((this.parent.scale.x + original.x) * change) - this.parent.scale.x) / this.options.smooth,
-                    y: (((this.parent.scale.y + original.y) * change) - this.parent.scale.y) / this.options.smooth,
+                    x:
+            ((this.parent.scale.x + original.x) * change
+              - this.parent.scale.x)
+            / this.options.smooth,
+                    y:
+            ((this.parent.scale.y + original.y) * change
+              - this.parent.scale.y)
+            / this.options.smooth,
                 };
                 this.smoothingCount = 0;
                 this.smoothingCenter = point;
@@ -332,16 +355,20 @@ export class Wheel extends Plugin
                 }
                 else
                 {
-                    const newPoint = this.parent.toGlobal(oldPoint as PointData);
+                    this.parent.parent.toLocal(
+                        oldPoint as PointData,
+                        this.parent,
+                        oldPoint
+                    );
+                    const comparePoint = this.parent.parent.toLocal(point as PointData);
 
-                    this.parent.x += point.x - newPoint.x;
-                    this.parent.y += point.y - newPoint.y;
+                    this.parent.x += comparePoint.x - (oldPoint as PointData).x;
+                    this.parent.y += comparePoint.y - (oldPoint as PointData).y;
                 }
             }
 
             this.parent.emit('moved', { viewport: this.parent, type: 'wheel' });
-            this.parent.emit('wheel-start',
-                { event: e, viewport: this.parent });
+            this.parent.emit('wheel-start', { event: e, viewport: this.parent });
         }
 
         return !this.parent.options.passiveWheel;

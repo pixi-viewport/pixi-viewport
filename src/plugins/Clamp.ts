@@ -22,45 +22,45 @@ import type { Viewport } from '../Viewport';
 export interface IClampOptions
 {
     /**
-    * Clamp left; true = 0
-    *
-    * @default false
-    */
+   * Clamp left; true = 0
+   *
+   * @default false
+   */
     left?: number | boolean | null;
 
     /**
-    * Clamp top; true = 0
-    *
-    * @default false
-    */
+   * Clamp top; true = 0
+   *
+   * @default false
+   */
     top?: number | boolean | null;
 
     /**
-     * Clamp right; true = viewport.worldWidth
-     *
-     * @default false
-     */
+   * Clamp right; true = viewport.worldWidth
+   *
+   * @default false
+   */
     right?: number | boolean | null;
 
     /**
-     * Clamp bottom; true = viewport.worldHeight
-     *
-     * @default false
-     */
+   * Clamp bottom; true = viewport.worldHeight
+   *
+   * @default false
+   */
     bottom?: number | boolean | null;
 
     /**
-     * (all, x, or y) using clamps of [0, viewport.worldWidth/viewport.worldHeight]; replaces left/right/top/bottom if set
-     *
-     * @default null
-     */
+   * (all, x, or y) using clamps of [0, viewport.worldWidth/viewport.worldHeight]; replaces left/right/top/bottom if set
+   *
+   * @default null
+   */
     direction?: 'all' | 'x' | 'y' | null;
 
     /**
-     * Where to place world if too small for screen (e.g., top-right, center, none, bottomleft)
-     *
-     * @default 'center'
-     */
+   * Where to place world if too small for screen (e.g., top-right, center, none, bottomleft)
+   *
+   * @default 'center'
+   */
     underflow?: 'center' | string;
 }
 
@@ -70,7 +70,7 @@ const DEFAULT_CLAMP_OPTIONS: Required<IClampOptions> = {
     top: false,
     bottom: false,
     direction: null,
-    underflow: 'center'
+    underflow: 'center',
 };
 
 /**
@@ -96,19 +96,31 @@ export class Clamp extends Plugin
     protected underflowY!: -1 | 0 | 1;
 
     /**
-     * This is called by {@link Viewport.clamp}.
-     */
-    constructor(parent: Viewport, options : IClampOptions = {})
+   * This is called by {@link Viewport.clamp}.
+   */
+    constructor(parent: Viewport, options: IClampOptions = {})
     {
         super(parent);
         this.options = Object.assign({}, DEFAULT_CLAMP_OPTIONS, options);
 
         if (this.options.direction)
         {
-            this.options.left = this.options.direction === 'x' || this.options.direction === 'all' ? true : null;
-            this.options.right = this.options.direction === 'x' || this.options.direction === 'all' ? true : null;
-            this.options.top = this.options.direction === 'y' || this.options.direction === 'all' ? true : null;
-            this.options.bottom = this.options.direction === 'y' || this.options.direction === 'all' ? true : null;
+            this.options.left
+        = this.options.direction === 'x' || this.options.direction === 'all'
+                    ? true
+                    : null;
+            this.options.right
+        = this.options.direction === 'x' || this.options.direction === 'all'
+                    ? true
+                    : null;
+            this.options.top
+        = this.options.direction === 'y' || this.options.direction === 'all'
+                    ? true
+                    : null;
+            this.options.bottom
+        = this.options.direction === 'y' || this.options.direction === 'all'
+                    ? true
+                    : null;
         }
 
         this.parseUnderflow();
@@ -131,10 +143,18 @@ export class Clamp extends Plugin
         }
         else
         {
-            // eslint-disable-next-line no-nested-ternary
-            this.underflowX = (clamp.indexOf('left') !== -1) ? -1 : (clamp.indexOf('right') !== -1) ? 1 : 0;
-            // eslint-disable-next-line no-nested-ternary
-            this.underflowY = (clamp.indexOf('top') !== -1) ? -1 : (clamp.indexOf('bottom') !== -1) ? 1 : 0;
+            this.underflowX
+        = clamp.indexOf('left') !== -1
+                    ? -1
+                    : clamp.indexOf('right') !== -1
+                        ? 1
+                        : 0;
+            this.underflowY
+        = clamp.indexOf('top') !== -1
+                    ? -1
+                    : clamp.indexOf('bottom') !== -1
+                        ? 1
+                        : 0;
             this.noUnderflow = false;
         }
     }
@@ -154,10 +174,12 @@ export class Clamp extends Plugin
         }
 
         // only clamp on change
-        if (this.parent.x === this.last.x
-            && this.parent.y === this.last.y
-            && this.parent.scale.x === this.last.scaleX
-            && this.parent.scale.y === this.last.scaleY)
+        if (
+            this.parent.x === this.last.x
+      && this.parent.y === this.last.y
+      && this.parent.scale.x === this.last.scaleX
+      && this.parent.scale.y === this.last.scaleY
+        )
         {
             return;
         }
@@ -169,7 +191,10 @@ export class Clamp extends Plugin
         {
             let moved = false;
 
-            if (!this.noUnderflow && this.parent.screenWorldWidth < this.parent.screenWidth)
+            if (
+                !this.noUnderflow
+        && this.parent.screenWorldWidth < this.parent.screenWidth
+            )
             {
                 switch (this.underflowX)
                 {
@@ -181,16 +206,24 @@ export class Clamp extends Plugin
                         }
                         break;
                     case 1:
-                        if (this.parent.x !== this.parent.screenWidth - this.parent.screenWorldWidth)
+                        if (
+                            this.parent.x
+              !== this.parent.screenWidth - this.parent.screenWorldWidth
+                        )
                         {
-                            this.parent.x = this.parent.screenWidth - this.parent.screenWorldWidth;
+                            this.parent.x
+                = this.parent.screenWidth - this.parent.screenWorldWidth;
                             moved = true;
                         }
                         break;
                     default:
-                        if (this.parent.x !== (this.parent.screenWidth - this.parent.screenWorldWidth) / 2)
+                        if (
+                            this.parent.x
+              !== (this.parent.screenWidth - this.parent.screenWorldWidth) / 2
+                        )
                         {
-                            this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
+                            this.parent.x
+                = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
                             moved = true;
                         }
                 }
@@ -199,19 +232,33 @@ export class Clamp extends Plugin
             {
                 if (this.options.left !== null)
                 {
-                    if (this.parent.left < (this.options.left === true ? 0 : this.options.left))
+                    if (
+                        this.parent.left
+            < (this.options.left === true ? 0 : (this.options.left as number))
+                    )
                     {
-                        this.parent.x = -(this.options.left === true ? 0 : this.options.left) * this.parent.scale.x;
+                        this.parent.x
+              = -(this.options.left === true ? 0 : this.options.left)
+              * this.parent.scale.x;
                         decelerate.x = 0;
                         moved = true;
                     }
                 }
                 if (this.options.right !== null)
                 {
-                    if (this.parent.right > (this.options.right === true ? this.parent.worldWidth : this.options.right))
+                    if (
+                        this.parent.right
+            > (this.options.right === true
+                ? this.parent.worldWidth
+                : (this.options.right as number))
+                    )
                     {
-                        this.parent.x = (-(this.options.right === true ? this.parent.worldWidth : this.options.right)
-                            * this.parent.scale.x) + this.parent.screenWidth;
+                        this.parent.x
+              = -(this.options.right === true
+                                ? this.parent.worldWidth
+                                : this.options.right)
+                * this.parent.scale.x
+              + this.parent.screenWidth;
                         decelerate.x = 0;
                         moved = true;
                     }
@@ -219,14 +266,21 @@ export class Clamp extends Plugin
             }
             if (moved)
             {
-                this.parent.emit('moved', { viewport: this.parent, original, type: 'clamp-x' });
+                this.parent.emit('moved', {
+                    viewport: this.parent,
+                    original,
+                    type: 'clamp-x',
+                });
             }
         }
         if (this.options.top !== null || this.options.bottom !== null)
         {
             let moved = false;
 
-            if (!this.noUnderflow && this.parent.screenWorldHeight < this.parent.screenHeight)
+            if (
+                !this.noUnderflow
+        && this.parent.screenWorldHeight < this.parent.screenHeight
+            )
             {
                 switch (this.underflowY)
                 {
@@ -238,16 +292,24 @@ export class Clamp extends Plugin
                         }
                         break;
                     case 1:
-                        if (this.parent.y !== this.parent.screenHeight - this.parent.screenWorldHeight)
+                        if (
+                            this.parent.y
+              !== this.parent.screenHeight - this.parent.screenWorldHeight
+                        )
                         {
-                            this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
+                            this.parent.y
+                = this.parent.screenHeight - this.parent.screenWorldHeight;
                             moved = true;
                         }
                         break;
                     default:
-                        if (this.parent.y !== (this.parent.screenHeight - this.parent.screenWorldHeight) / 2)
+                        if (
+                            this.parent.y
+              !== (this.parent.screenHeight - this.parent.screenWorldHeight) / 2
+                        )
                         {
-                            this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
+                            this.parent.y
+                = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
                             moved = true;
                         }
                 }
@@ -256,20 +318,33 @@ export class Clamp extends Plugin
             {
                 if (this.options.top !== null)
                 {
-                    if (this.parent.top < (this.options.top === true ? 0 : this.options.top))
+                    if (
+                        this.parent.top
+            < (this.options.top === true ? 0 : (this.options.top as number))
+                    )
                     {
-                        this.parent.y = -(this.options.top === true ? 0 : this.options.top)
-                            * this.parent.scale.y;
+                        this.parent.y
+              = -(this.options.top === true ? 0 : this.options.top)
+              * this.parent.scale.y;
                         decelerate.y = 0;
                         moved = true;
                     }
                 }
                 if (this.options.bottom !== null)
                 {
-                    if (this.parent.bottom > (this.options.bottom === true ? this.parent.worldHeight : this.options.bottom))
+                    if (
+                        this.parent.bottom
+            > (this.options.bottom === true
+                ? this.parent.worldHeight
+                : (this.options.bottom as number))
+                    )
                     {
-                        this.parent.y = (-(this.options.bottom === true ? this.parent.worldHeight : this.options.bottom)
-                            * this.parent.scale.y) + this.parent.screenHeight;
+                        this.parent.y
+              = -(this.options.bottom === true
+                                ? this.parent.worldHeight
+                                : this.options.bottom)
+                * this.parent.scale.y
+              + this.parent.screenHeight;
                         decelerate.y = 0;
                         moved = true;
                     }
@@ -277,7 +352,11 @@ export class Clamp extends Plugin
             }
             if (moved)
             {
-                this.parent.emit('moved', { viewport: this.parent, original, type: 'clamp-y' });
+                this.parent.emit('moved', {
+                    viewport: this.parent,
+                    original,
+                    type: 'clamp-y',
+                });
             }
         }
         this.last.x = this.parent.x;
